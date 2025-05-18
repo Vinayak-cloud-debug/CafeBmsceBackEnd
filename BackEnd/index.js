@@ -22,7 +22,7 @@ dotenv.config();
 const App = express();
 
 App.use(cors({
-	origin: 'http://localhost:3000', // Allow requests from this frontend
+	origin: 'https://cafebmscefrontend.onrender.com', // Allow requests from this frontend
 	methods: 'GET,POST,PUT,DELETE',
 	allowedHeaders: 'Content-Type,Authorization',
 	credentials:true
