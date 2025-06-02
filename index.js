@@ -22,7 +22,7 @@ dotenv.config();
 const App = express();
 
 App.use(cors({
-	origin: 'http://localhost:3000', // Allow requests from this frontend
+	origin: ['http://localhost:3000','https://cafebmscebackend.onrender.com'] // Allow requests from this frontend
 	methods: 'GET,POST,PUT,DELETE',
 	allowedHeaders: 'Content-Type,Authorization',
 	credentials:true
@@ -244,7 +244,7 @@ App.post('/api/auth/Verify-Gmail',  async (req, res) => {
 })
 
 
-App.listen(PORT,err=>{
+App.listen(PORT,'0.0.0.0',err=>{
 
     connectToMongoDB();
 
