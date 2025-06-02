@@ -95,14 +95,14 @@ const logout = (req, res) => {
     res.cookie("jwt", "", {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "None",
       expires: new Date(0), // Set an explicit expiration date (past date)
     });
 
     res.clearCookie("jwt", {
       httpOnly: true,
       secure: true,
-      sameSite: "Strict",
+      sameSite: "None",
     });
 
 
