@@ -12,12 +12,13 @@ const generateToken = (userId, res) => {
   //   secure: false, // Ensure cookies are sent over HTTPS in production
   //   maxAge: 15 * 24 * 60 * 60 * 1000, // Cookie will expire in 15 days
   // });
-  res.cookie("jwt", token, {
-	maxAge: 15 * 24 * 60 * 60 * 1000,  // Cookie will persist for 15 days
-	httpOnly: true,                   // Prevents access from JavaScript (XSS protection)
-	sameSite: "Strict",               // Protects against CSRF attacks
-	secure: true,                     // Ensures the cookie is only sent over HTTPS
-  });
+res.cookie("jwt", token, {
+  httpOnly: true,
+  secure: true,               // Required for HTTPS (Vercel and Render both use HTTPS)
+  sameSite: "None",           // Must be "None" for cross-site cookie sharing
+  maxAge: 15 * 24 * 60 * 60 * 1000 // 15 days
+});
+
 
   return token;
 };
