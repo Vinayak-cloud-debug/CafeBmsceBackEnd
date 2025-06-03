@@ -65,6 +65,7 @@ App.post('/api/ConfirmOrderDetails',async(req,res)=>{
     const email = req.body.email;
     var cart =  req.body.cartData
     const totalAmount = req.body.totalAmount
+    const canteenName = req.body.canteenName
 
   
   if (!email || !cart  ) {
@@ -83,6 +84,7 @@ App.post('/api/ConfirmOrderDetails',async(req,res)=>{
     // Create new order
     const newOrder = new Order({
       user: user._id,
+      canteenName:canteenName,
       items: cart,
       totalAmount: totalAmount,
     });
