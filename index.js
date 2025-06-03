@@ -67,7 +67,7 @@ App.post('/api/ConfirmOrderDetails',async(req,res)=>{
     const totalAmount = req.body.totalAmount
 
   
-  if (!email || !cart  || cart.length === 0) {
+  if (!email || !cart  ) {
     return res.status(400).json({ message: "Invalid order request" });
   }
 
