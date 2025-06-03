@@ -242,7 +242,7 @@ setInterval(() => {
   axios.get('https://cafe-bmsce-front-end.vercel.app')
     .then(() => console.log('⏱️ Keep-alive ping sent'))
     .catch((err) => console.error('Ping error:', err.message));
-}, 5 * 60 * 1000); 
+}, 9000); 
 
 App.listen(PORT,'0.0.0.0',err=>{
 
