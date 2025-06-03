@@ -63,7 +63,7 @@ App.post('/api/fetchUserOrders',async(req,res)=>{
 App.post('/api/ConfirmOrderDetails',async(req,res)=>{
 
     const email = req.body.email;
-    var cart =  req.body.items
+    var cart =  req.body.cartData
     const totalAmount = req.body.totalAmount
 
   
@@ -71,7 +71,6 @@ App.post('/api/ConfirmOrderDetails',async(req,res)=>{
     return res.status(400).json({ message: "Invalid order request" });
   }
 
-  console.log("after array check")
 
   try {
     // Find the user by username (you are storing email in the username field)
