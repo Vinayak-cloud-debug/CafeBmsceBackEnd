@@ -62,9 +62,8 @@ App.post('/api/fetchUserOrders',async(req,res)=>{
 
 App.post('/api/ConfirmOrderDetails',async(req,res)=>{
 
-    console.log(req.body.orderData)
     const email = req.body.email;
-    var cart =  req.body.orderData.items
+    var cart =  req.body.items
     const totalAmount = req.body.totalAmount
 
   
@@ -139,13 +138,10 @@ App.get("/api/getToken", async (req, res) => {
 })
 
 
-App.use(cors({origin:"*"}))
-App.use(bp.json())
-App.use(express.urlencoded({ extended: false}))
+
 
 App.use("/api/Customer",CustomerLogin)
-App.use("/api/Food",FoodQtyIncrement)
-App.use("/api/FoodtoBe",FoodQtyDecrement)
+
 
 
 App.get("/api/GetAllFoodItems",async(req,resp)=>{
