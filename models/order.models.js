@@ -7,6 +7,10 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    canteenName:{
+      type:String,
+      required:true,
+    },
     items: [
       {
         name: { type: String, required: true },
