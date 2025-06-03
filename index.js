@@ -95,7 +95,7 @@ App.post('/api/ConfirmOrderDetails',async(req,res)=>{
     user.orders.push(savedOrder._id);
     await user.save();
 
-    return res.status(200).json("Order Confirmed");
+    return res.status(200).json({msg:"Order Confirmed"});
 
   } catch (err) {
     console.error("Order error:", err);
