@@ -41,10 +41,8 @@ App.use("/api/auth", authRoutes);
 App.post('/api/fetchUserOrders',async(req,res)=>{
 
     try {
-    const email = req.body.email;
 
-    // Find user by email or username
-    const user = await User.findOne({ username: email }).populate({
+    const user = await User.find({}).populate({
       path: "orders",
       populate: {
         path: "items", // not needed unless items reference other docs
@@ -53,12 +51,15 @@ App.post('/api/fetchUserOrders',async(req,res)=>{
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json(user.orders);
+    console.log(user)
+
+    res.json(user);
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Server error" });
   }
 })
+
 
 App.post('/api/ConfirmOrderDetails',async(req,res)=>{
 
