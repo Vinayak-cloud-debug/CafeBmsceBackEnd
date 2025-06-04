@@ -335,6 +335,8 @@ App.put('/api/updateOrderStatus', async (req, res) => {
     const {fullName,email, orderId} = req.body;
 	  const status = req.body.status;
 
+	console.log(status,req.body.status)
+
     // Validate input
      if (!fullName || !email || !orderId || !status) {
       return res.status(400).json({ 
