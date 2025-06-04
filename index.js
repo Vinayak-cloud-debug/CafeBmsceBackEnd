@@ -331,21 +331,63 @@ setInterval(() => {
 
 
 App.put('/api/updateOrderStatus', async (req, res) => {
-  const { orderId, newStatus } = req.body;
-
   try {
-    const order = await Order.findById(orderId);
-    if (!order) return res.status(404).json({ error: 'Order not found' });
+    const { orderId, status } = req.body;
 
-    order.status = newStatus;
-    await order.save();
+    // Validate input
+    if (!orderId || !status) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: orderId and status are required' 
+      });
+    }
 
-    res.json({ message: 'Order status updated successfully' });
+
+    // Validate status value
+    const validStatuses = ['pending', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status.toLowerCase())) {
+      return res.status(400).json({ 
+        error: 'Invalid status. Must be one of: pending, shipped, delivered, cancelled' 
+      });
+    }
+
+    
+    // Method 3: If you have a separate Order collection
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { 
+        status: status.toLowerCase(),
+        updatedAt: new Date()
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (updatedOrder) {
+      return res.status(200).json({
+        message: 'Order status updated successfully',
+        order: {
+          _id: updatedOrder._id,
+          status: updatedOrder.status,
+          updatedAt: updatedOrder.updatedAt
+        }
+      });
+    }
+
+    // If no order found
+    return res.status(404).json({ 
+      error: 'Order not found' 
+    });
+
   } catch (error) {
-    console.error('Update failed:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error updating order status:', error);
+    res.status(500).json({ 
+      error: 'Failed to update order status',
+      message: error.message 
+    });
   }
 });
+
+
+
 
 
 App.listen(PORT,'0.0.0.0',err=>{
