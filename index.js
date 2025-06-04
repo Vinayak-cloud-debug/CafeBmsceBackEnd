@@ -46,7 +46,7 @@ App.post('/api/fetchUserOrdersEmail',async(req,res)=>{
       const email = req.body.email
 	console.log(email)
 
-    const user = await User.find({email:email}).populate({
+    const user = await User.findOne({email:email}).populate({
       path: "orders",
       populate: {
         path: "items", // not needed unless items reference other docs
