@@ -332,12 +332,12 @@ setInterval(() => {
 
 App.put('/api/updateOrderStatus', async (req, res) => {
   try {
-    const { orderId, status } = req.body;
+    const {fullName,email, orderId, status } = req.body;
 
     // Validate input
-    if (!orderId || !status) {
+     if (!fullName || !email || !orderId || !status) {
       return res.status(400).json({ 
-        error: 'Missing required fields: orderId and status are required' 
+        error: 'Missing required fields:UserName ,email, orderId and status are required' 
       });
     }
 
@@ -362,6 +362,28 @@ App.put('/api/updateOrderStatus', async (req, res) => {
     );
 
     if (updatedOrder) {
+
+   const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+
+    await transporter.sendMail({
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Your Status Has been Updated By Cafe BMSCE',
+      html: `<p>${fullName} Your Order Status: <strong>${updatedOrder.status}</strong>. 
+      Thank you for Ordering .</p>`,
+    });
+
+
+
+
+	    
       return res.status(200).json({
         message: 'Order status updated successfully',
         order: {
