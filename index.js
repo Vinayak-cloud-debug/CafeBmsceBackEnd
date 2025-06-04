@@ -66,7 +66,7 @@ App.post('/api/fetchUserOrdersEmail',async(req,res)=>{
 
 
 
-App.post('/api/fetchUserOrders',async(req,res)=>{
+App.get('/api/fetchUserOrders',async(req,res)=>{
 
     try {
 
