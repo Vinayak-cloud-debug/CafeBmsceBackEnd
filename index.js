@@ -54,9 +54,9 @@ App.post('/api/fetchUserOrdersEmail',async(req,res)=>{
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    console.log(user)
+    console.log(user.User)
 
-    res.json(user);
+    res.json(user.User);
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Server error" });
