@@ -95,10 +95,63 @@ App.post('/api/ConfirmOrderDetails',async(req,res)=>{
     user.orders.push(savedOrder._id);
     await user.save();
 
+     const transporter = nodemailer.createTransport({
+      service: 'gmail', // You can use any email service
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+
+    // Create invoice HTML (simplified example)
+    let itemDetails = cart.map(item => `
+      <li>${item.name} - ${item.quantity} x ₹${item.price}</li>
+    `).join("");
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Order Invoice from Cafe BMSCE!',
+      html: `
+        <h2>Invoice from ${canteenName}</h2>
+        <p>Thank you for your order, we will confirm your order Soon!</p>
+        <ul>${itemDetails}</ul>
+        <p><strong>Total: ₹${totalAmount}</strong></p>
+      `
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+
     return res.status(200).json({msg:"Order Confirmed"});
 
   } catch (err) {
     console.error("Order error:", err);
+	   const transporter = nodemailer.createTransport({
+      service: 'gmail', // You can use any email service
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+
+  
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Your Order failed from Cafe BMSCE!',
+      html: `
+        <h2> ${canteenName}</h2>
+        <p>Order failed due to network error , please try again!</p>
+        
+      `
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
     return res.status(500).json({ message: "Server error placing order" });
   }
 })
