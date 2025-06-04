@@ -332,7 +332,8 @@ setInterval(() => {
 
 App.put('/api/updateOrderStatus', async (req, res) => {
   try {
-    const {fullName,email, orderId, status } = req.body;
+    const {fullName,email, orderId} = req.body;
+	  const status = req.body.status;
 
     // Validate input
      if (!fullName || !email || !orderId || !status) {
