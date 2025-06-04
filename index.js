@@ -44,6 +44,7 @@ App.post('/api/fetchUserOrdersEmail',async(req,res)=>{
     try {
 
       const email = req.body.email
+	console.log(email)
 
     const user = await User.find({email:email}).populate({
       path: "orders",
@@ -54,9 +55,9 @@ App.post('/api/fetchUserOrdersEmail',async(req,res)=>{
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    console.log(user.User)
+    console.log(user)
 
-    res.json(user.User);
+    res.json(user);
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Server error" });
