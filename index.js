@@ -299,6 +299,25 @@ setInterval(() => {
     .catch((err) => console.error('Ping error:', err.message));
 }, 9000); 
 
+
+App.put('/api/updateOrderStatus', async (req, res) => {
+  const { orderId, newStatus } = req.body;
+
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    order.status = newStatus;
+    await order.save();
+
+    res.json({ message: 'Order status updated successfully' });
+  } catch (error) {
+    console.error('Update failed:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 App.listen(PORT,'0.0.0.0',err=>{
 
     connectToMongoDB();
