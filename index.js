@@ -323,12 +323,6 @@ App.post('/api/auth/Verify-Gmail',  async (req, res) => {
 
 })
 
-setInterval(() => {
-  axios.get('https://cafe-bmsce-front-end.vercel.app')
-    .then(() => console.log('⏱️ Keep-alive ping sent'))
-    .catch((err) => console.error('Ping error:', err.message));
-}, 9000); 
-
 
 
 
