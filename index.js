@@ -330,15 +330,16 @@ setInterval(() => {
 }, 9000); 
 
 
+
+
 App.put('/api/updateOrderStatus', async (req, res) => {
   try {
-    const {fullName,email, orderId} = req.body;
-	  const status = req.body.status;
+    const {orders,fullName,email, orderId, status } = req.body;
 
-	console.log(fullName,email,orderId,status);
+    console.log(orders)
 
     // Validate input
-     if (!fullName || !email || !orderId || !status) {
+    if (!fullName || !email || !orderId || !status) {
       return res.status(400).json({ 
         error: 'Missing required fields:UserName ,email, orderId and status are required' 
       });
@@ -354,7 +355,7 @@ App.put('/api/updateOrderStatus', async (req, res) => {
     }
 
     
-    // Method 3: If you have a separate Order collection
+    
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
       { 
@@ -366,7 +367,77 @@ App.put('/api/updateOrderStatus', async (req, res) => {
 
     if (updatedOrder) {
 
-   const transporter = nodemailer.createTransport({
+
+      const orderRows = orders.items.map(item => `
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">₹${item.price}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">₹${item.quantity * item.price}</td>
+      </tr>
+    `).join('');
+
+    const status = updatedOrder.status.toLowerCase();
+    const restaurantCharge = 7;
+    const platformFee = 5;
+    const packingCharge = 4;
+    const extraCharges = restaurantCharge + platformFee + packingCharge;
+    const totalPayable = updatedOrder.totalAmount + extraCharges;
+
+    // Conditionally show shipped message
+    const shippedNote = status === 'shipped' 
+      ? `<p style="color: green;"><strong>Your order has been shipped and is on the way!</strong></p>` 
+      : '';
+
+    // Conditionally hide Total Amount to be Paid if cancelled
+    const finalTotalRow = status !== 'cancelled' 
+      ? `
+        <tr>
+          <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>Total Amount to be Paid:</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>₹${totalPayable}</strong></td>
+        </tr>` 
+      : '';
+
+      const invoiceHtml = `
+        <h2>Hello ${fullName},</h2>
+        <p>Your order status has been updated to <strong>${updatedOrder.status.toUpperCase()}</strong>.</p>
+        ${shippedNote}
+        <h3>Invoice from ${updatedOrder.canteenName || 'Canteen'}</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <thead>
+            <tr>
+              <th style="padding: 8px; border: 1px solid #ddd;">Item</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Quantity</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Price</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orderRows}
+            <tr>
+              <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>Total:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>₹${updatedOrder.totalAmount}</strong></td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>Restaurant Charges:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>₹${restaurantCharge}</strong></td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>Platform Fee:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>₹${platformFee}</strong></td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>Packing Charges:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>₹${packingCharge}</strong></td>
+            </tr>
+            ${finalTotalRow}
+          </tbody>
+        </table>
+        <p>Thank you for ordering from ${updatedOrder.canteenName}!</p>
+      `;
+
+
+        const transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
           user: process.env.EMAIL,
@@ -375,18 +446,18 @@ App.put('/api/updateOrderStatus', async (req, res) => {
       });
 
 
-    await transporter.sendMail({
-      from: process.env.EMAIL,
-      to: email,
-      subject: 'Your Status Has been Updated By Cafe BMSCE',
-      html: `<p>${fullName} Your Order Status: <strong>${updatedOrder.status}</strong>. 
-      Thank you for Ordering .</p>`,
-    });
+          
+      await transporter.sendMail({
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'Your Order Invoice - Cafe BMSCE',
+        html: invoiceHtml,
+      });
 
 
 
 
-	    
+
       return res.status(200).json({
         message: 'Order status updated successfully',
         order: {
@@ -410,6 +481,89 @@ App.put('/api/updateOrderStatus', async (req, res) => {
     });
   }
 });
+
+
+
+// App.put('/api/updateOrderStatus', async (req, res) => {
+//   try {
+//     const {fullName,email, orderId} = req.body;
+// 	  const status = req.body.status;
+
+// 	console.log(fullName,email,orderId,status);
+
+//     // Validate input
+//      if (!fullName || !email || !orderId || !status) {
+//       return res.status(400).json({ 
+//         error: 'Missing required fields:UserName ,email, orderId and status are required' 
+//       });
+//     }
+
+
+//     // Validate status value
+//     const validStatuses = ['pending', 'shipped', 'delivered', 'cancelled'];
+//     if (!validStatuses.includes(status.toLowerCase())) {
+//       return res.status(400).json({ 
+//         error: 'Invalid status. Must be one of: pending, shipped, delivered, cancelled' 
+//       });
+//     }
+
+    
+//     // Method 3: If you have a separate Order collection
+//     const updatedOrder = await Order.findByIdAndUpdate(
+//       orderId,
+//       { 
+//         status: status.toLowerCase(),
+//         updatedAt: new Date()
+//       },
+//       { new: true, runValidators: true }
+//     );
+
+//     if (updatedOrder) {
+
+//    const transporter = nodemailer.createTransport({
+//         service: 'Gmail',
+//         auth: {
+//           user: process.env.EMAIL,
+//           pass: process.env.EMAIL_PASSWORD,
+//         },
+//       });
+
+
+//     await transporter.sendMail({
+//       from: process.env.EMAIL,
+//       to: email,
+//       subject: 'Your Status Has been Updated By Cafe BMSCE',
+//       html: `<p>${fullName} Your Order Status: <strong>${updatedOrder.status}</strong>. 
+//       Thank you for Ordering .</p>`,
+//     });
+
+
+
+
+	    
+//       return res.status(200).json({
+//         message: 'Order status updated successfully',
+//         order: {
+//           _id: updatedOrder._id,
+//           status: updatedOrder.status,
+//           updatedAt: updatedOrder.updatedAt
+//         }
+//       });
+//     }
+
+//     // If no order found
+//     return res.status(404).json({ 
+//       error: 'Order not found' 
+//     });
+
+//   } catch (error) {
+//     console.error('Error updating order status:', error);
+//     res.status(500).json({ 
+//       error: 'Failed to update order status',
+//       message: error.message 
+//     });
+//   }
+// });
 
 
 
